@@ -32,6 +32,14 @@ dependencies:
   hive_flutter: ^1.0.0
   file_picker: ^3.0.1
   path: ^1.8.0
+  url_launcher: ^6.0.3
+  json_annotation: ^3.1.1
+  printing: ^5.1.0
+  pdf: ^3.2.0
+  full_screen_image: ^1.0.2
+
+  
+
     # When depending on this package from a real application you should use:
     #   file_selector: ^x.y.z
     # See https://dart.dev/tools/pub/dependencies#version-constraints
@@ -43,8 +51,11 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  hive_generator: ^1.0.1
-  build_runner: ^1.12.2
+  hive_generator: ^1.0.0
+  json_serializable: ^3.5.1
+  build_runner: ^1.11.5
+
+
  
 
 # For information on the generic Dart part of this file, see the
@@ -52,6 +63,8 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
+  assets:
+    - assets/drawer_header.jpg
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

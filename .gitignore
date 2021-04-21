@@ -54,5 +54,4 @@ app.*.map.json
 \go\build\outputs
 
 # database and assets
-/db/
-/assets/
+/21-data/

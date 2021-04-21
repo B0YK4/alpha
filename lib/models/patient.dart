@@ -1,20 +1,28 @@
-import 'dart:convert';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'patient.g.dart';
+
+@JsonSerializable()
 class Patient {
-  final int id;
+  final String id;
+  final String date;
   final String name;
-  final int age;
-  Patient({this.id, this.name, this.age});
-  factory Patient.fromJson(json) {
-    return Patient(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      age: json['age'] as int,
-    );
-  }
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'age': age,
-      };
+  final String age;
+  final List<String> operations;
+  final List<String> examinations;
+  final List<String> statements;
+
+  Patient(
+      {this.id,
+      this.date,
+      this.name,
+      this.age,
+      this.operations,
+      this.examinations,
+      this.statements});
+
+  factory Patient.fromJson(Map<String, dynamic> json) =>
+      _$PatientFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PatientToJson(this);
 }
