@@ -65,16 +65,31 @@ class _AddPatientState extends State<AddPatient> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.all(10),
-                      child: Text(
-                        "id: ${widget.id}",
-                        style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
+                    Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Container(
+                            padding: EdgeInsets.all(5),
+                            height: 90,
+                            width: 100,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.blue,
+                                width: 1,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text('new ID',
+                                      style: TextStyle(color: Colors.blue)),
+                                  Divider(color: Colors.blue),
+                                  Text(
+                                    '${widget.id}',
+                                    style: TextStyle(fontSize: 20),
+                                  )
+                                ]))),
                     TextFormField(
                       controller: _namecontroller,
                       decoration: const InputDecoration(
@@ -258,7 +273,7 @@ class _AddPatientState extends State<AddPatient> {
                                 _namecontroller.text.replaceAll(' ', '_') +
                                     '#' +
                                     widget.id +
-                                    "-statements";
+                                    "-";
                             String sheetname =
                                 '$dir\\${year}data\\sheets\\$patientInfo';
                             newstatements = await saveSheets(

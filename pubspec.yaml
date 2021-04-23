@@ -37,6 +37,8 @@ dependencies:
   printing: ^5.1.0
   pdf: ^3.2.0
   full_screen_image: ^1.0.2
+  path_provider: ^2.0.1
+  hex: ^0.2.0
 
   
 
@@ -51,7 +53,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  hive_generator: ^1.0.0
+  hive_generator: any
   json_serializable: ^3.5.1
   build_runner: ^1.11.5
 
@@ -101,3 +103,5 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+dependency_overrides:
+  dartx: any

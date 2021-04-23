@@ -4,6 +4,7 @@ import 'package:alpha/models/patient.dart';
 import 'package:alpha/screens/add_patient.dart';
 import 'package:alpha/screens/patient_detials.dart';
 import 'package:alpha/main.dart';
+import 'package:alpha/screens/search.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -20,7 +21,7 @@ class Home extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: MyHomePage(
-        title: 'alpha Demo Home Page',
+        title: 'Demo Home Page',
       ),
     );
   }
@@ -36,8 +37,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final patientBox = Hive.box("testbox");
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -161,47 +160,26 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         )),
         appBar: AppBar(
-          actions: [IconButton(icon: Icon(Icons.search), onPressed: () {})],
+          actions: [
+            IconButton(
+                icon: Icon(Icons.search),
+                onPressed: () {
+                  final patientBox = Hive.box("testbox");
+                  final List<Patient> patientlist = [];
+                  for (var i = 0; i < patientBox.length; i++) {
+                    patientlist
+                        .add(Patient.fromJson(jsonDecode(patientBox.get(i))));
+                  }
+                  showSearch(
+                      context: context, delegate: BuildSearch(patientlist));
+                }),
+            SizedBox(
+              width: 30,
+            )
+          ],
           title: Text(widget.title),
         ),
-        body: WatchBoxBuilder(
-            box: Hive.box('testbox'),
-            builder: (context, contactsBox) {
-              return ListView.builder(
-                  itemCount: patientBox.length,
-                  itemBuilder: (context, index) {
-                    print(
-                        '=============================================================================');
-                    print(patientBox.get(index));
-                    print(jsonDecode(patientBox.get(index)));
-                    final Patient patient =
-                        Patient.fromJson(jsonDecode(patientBox.get(index)));
-                    return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => PatientDetails(
-                                        patient: patient,
-                                      )));
-                        },
-                        child: Container(
-                            padding: EdgeInsets.all(10),
-                            child: Card(
-                              elevation: 1,
-                              child: ListTile(
-                                leading: FlutterLogo(size: 72.0),
-                                title: Text('${patient.name.toString()}'),
-                                subtitle: Text('${patient.age.toString()}'),
-                                trailing: IconButton(
-                                  icon: Icon(Icons.more_vert),
-                                  onPressed: () {},
-                                ),
-                                isThreeLine: true,
-                              ),
-                            )));
-                  });
-            }),
+        body: PatientList(),
         floatingActionButton:
             Row(mainAxisAlignment: MainAxisAlignment.end, children: [
           FloatingActionButton(
@@ -212,7 +190,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   MaterialPageRoute(
                       fullscreenDialog: true,
                       builder: (context) => AddPatient(
-                            id: '$year${Hive.box('testbox').length}',
+                            id: '${Hive.box('testbox').length.toRadixString(16)}',
                           )));
             },
             tooltip: 'Add new patient',
@@ -222,5 +200,92 @@ class _MyHomePageState extends State<MyHomePage> {
             width: 30,
           ),
         ]));
+  }
+}
+
+class PatientList extends StatelessWidget {
+  final patientBox = Hive.box("testbox");
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: WatchBoxBuilder(
+          box: Hive.box('testbox'),
+          builder: (context, contactsBox) {
+            return ListView.builder(
+                itemCount: patientBox.length,
+                itemBuilder: (context, index) {
+                  print(
+                      '=============================================================================');
+                  print(patientBox.get(index));
+                  print(jsonDecode(patientBox.get(index)));
+                  final Patient patient =
+                      Patient.fromJson(jsonDecode(patientBox.get(index)));
+                  return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PatientDetails(
+                                      patient: patient,
+                                    )));
+                      },
+                      child: Container(
+                          padding: EdgeInsets.all(10),
+                          child: Card(
+                            elevation: 1,
+                            child: Row(children: [
+                              Padding(
+                                  padding: EdgeInsets.fromLTRB(10, 10, 30, 10),
+                                  child: Container(
+                                      padding: EdgeInsets.all(5),
+                                      height: 90,
+                                      width: 100,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: Colors.blue,
+                                          width: 1,
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Text('ID',
+                                                style: TextStyle(
+                                                    color: Colors.blue)),
+                                            Divider(color: Colors.blue),
+                                            Text(
+                                              '${patient.id}',
+                                              style: TextStyle(fontSize: 20),
+                                            )
+                                          ]))),
+                              Expanded(
+                                  child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                    Text('${patient.name.toString()}',
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black87)),
+                                    SizedBox(
+                                      height: 15,
+                                    ),
+                                    Text('${patient.age.toString()}',
+                                        style: TextStyle(
+                                            color: Colors.black54,
+                                            fontSize: 20)),
+                                  ])),
+                              IconButton(
+                                icon: Icon(Icons.more_vert),
+                                onPressed: () {},
+                              ),
+                            ]),
+                          )));
+                });
+          }),
+    );
   }
 }
