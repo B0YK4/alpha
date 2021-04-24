@@ -1,9 +1,10 @@
 import 'dart:convert';
-
+import 'package:alpha/screens/edit_patient.dart';
+import 'package:crypto/crypto.dart';
 import 'package:alpha/models/patient.dart';
+import 'package:alpha/screens/about.dart';
 import 'package:alpha/screens/add_patient.dart';
 import 'package:alpha/screens/patient_detials.dart';
-import 'package:alpha/main.dart';
 import 'package:alpha/screens/search.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -14,6 +15,10 @@ class Home extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    print(sha1
+        .convert(utf8.encode(Hive.box('testbox').length.toString()))
+        .toString()
+        .substring(0, 8));
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
@@ -81,7 +86,8 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               leading: Icon(Icons.info),
               onTap: () {
-                //Navigator.pop(context);
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => About()));
               },
             ),
             ListTile(
@@ -163,12 +169,13 @@ class _MyHomePageState extends State<MyHomePage> {
           actions: [
             IconButton(
                 icon: Icon(Icons.search),
+                tooltip: 'Search for patient',
                 onPressed: () {
                   final patientBox = Hive.box("testbox");
                   final List<Patient> patientlist = [];
                   for (var i = 0; i < patientBox.length; i++) {
                     patientlist
-                        .add(Patient.fromJson(jsonDecode(patientBox.get(i))));
+                        .add(Patient.fromJson(jsonDecode(patientBox.getAt(i))));
                   }
                   showSearch(
                       context: context, delegate: BuildSearch(patientlist));
@@ -190,11 +197,15 @@ class _MyHomePageState extends State<MyHomePage> {
                   MaterialPageRoute(
                       fullscreenDialog: true,
                       builder: (context) => AddPatient(
-                            id: '${Hive.box('testbox').length.toRadixString(16)}',
+                            id: sha1
+                                .convert(utf8.encode(
+                                    Hive.box('testbox').length.toString()))
+                                .toString()
+                                .substring(0, 8),
                           )));
             },
             tooltip: 'Add new patient',
-            child: Icon(Icons.add),
+            child: Icon(Icons.person_add),
           ),
           SizedBox(
             width: 30,
@@ -216,16 +227,17 @@ class PatientList extends StatelessWidget {
                 itemBuilder: (context, index) {
                   print(
                       '=============================================================================');
-                  print(patientBox.get(index));
-                  print(jsonDecode(patientBox.get(index)));
+
+                  print(jsonDecode(patientBox.getAt(index)));
                   final Patient patient =
-                      Patient.fromJson(jsonDecode(patientBox.get(index)));
+                      Patient.fromJson(jsonDecode(patientBox.getAt(index)));
                   return GestureDetector(
                       onTap: () {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => PatientDetails(
+                                      index: index,
                                       patient: patient,
                                     )));
                       },
@@ -257,7 +269,7 @@ class PatientList extends StatelessWidget {
                                             Divider(color: Colors.blue),
                                             Text(
                                               '${patient.id}',
-                                              style: TextStyle(fontSize: 20),
+                                              style: TextStyle(fontSize: 18),
                                             )
                                           ]))),
                               Expanded(
@@ -267,8 +279,7 @@ class PatientList extends StatelessWidget {
                                       children: [
                                     Text('${patient.name.toString()}',
                                         style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
+                                            fontSize: 24,
                                             color: Colors.black87)),
                                     SizedBox(
                                       height: 15,
@@ -279,9 +290,23 @@ class PatientList extends StatelessWidget {
                                             fontSize: 20)),
                                   ])),
                               IconButton(
-                                icon: Icon(Icons.more_vert),
-                                onPressed: () {},
+                                icon: Icon(
+                                  Icons.edit,
+                                  color: Colors.grey[600],
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => EditPatient(
+                                                index: index,
+                                                patient: patient,
+                                              )));
+                                },
                               ),
+                              SizedBox(
+                                width: 20,
+                              )
                             ]),
                           )));
                 });

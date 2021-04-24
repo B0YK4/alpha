@@ -1,4 +1,5 @@
 import 'package:alpha/models/patient.dart';
+import 'package:alpha/screens/edit_patient.dart';
 import 'package:alpha/screens/patient_detials.dart';
 import 'package:flutter/material.dart';
 
@@ -84,7 +85,7 @@ class BuildSearch extends SearchDelegate {
               ? patients
               : patients
                   .where((element) =>
-                      element.id.toLowerCase().contains(query.toLowerCase()))
+                      element.id.toLowerCase().startsWith(query.toLowerCase()))
                   .toList();
         }
         break;
@@ -144,6 +145,7 @@ class SearchList extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                             builder: (context) => PatientDetails(
+                                  index: index,
                                   patient: patients[index],
                                 )));
                   },
@@ -175,7 +177,7 @@ class SearchList extends StatelessWidget {
                                         Divider(color: Colors.blue),
                                         Text(
                                           '${patients[index].id}',
-                                          style: TextStyle(fontSize: 20),
+                                          style: TextStyle(fontSize: 18),
                                         )
                                       ]))),
                           Expanded(
@@ -184,9 +186,7 @@ class SearchList extends StatelessWidget {
                                   children: [
                                 Text('${patients[index].name.toString()}',
                                     style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87)),
+                                        fontSize: 24, color: Colors.black87)),
                                 SizedBox(
                                   height: 15,
                                 ),
@@ -195,9 +195,23 @@ class SearchList extends StatelessWidget {
                                         color: Colors.black54, fontSize: 20)),
                               ])),
                           IconButton(
-                            icon: Icon(Icons.more_vert),
-                            onPressed: () {},
+                            icon: Icon(
+                              Icons.edit,
+                              color: Colors.grey[600],
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => EditPatient(
+                                            index: index,
+                                            patient: patients[index],
+                                          )));
+                            },
                           ),
+                          SizedBox(
+                            width: 20,
+                          )
                         ]),
                       )));
             }));

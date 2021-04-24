@@ -45,13 +45,8 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# desktop build
-/linux/
-/windows/
-/macos/
+#windows
+/windows
 
-# flutter-go build output 
-\go\build\outputs
-
-# database and assets
-/21-data/
+#db
+/ClinicData

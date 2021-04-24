@@ -1,18 +1,61 @@
 import 'dart:io';
 
 import 'package:alpha/models/patient.dart';
+import 'package:alpha/screens/edit_patient.dart';
 import 'package:alpha/screens/show_image.dart';
 import 'package:flutter/material.dart';
 
-class PatientDetails extends StatelessWidget {
+class PatientDetails extends StatefulWidget {
   final Patient patient;
-  PatientDetails({this.patient});
+  final int index;
+  PatientDetails({this.patient, this.index});
+  @override
+  _PatientDetailsState createState() => _PatientDetailsState();
+}
+
+class _PatientDetailsState extends State<PatientDetails> {
+  Patient _patient;
+
+  _navigateAndDisplaySelection(BuildContext context) async {
+    // Navigator.push returns a Future that completes after calling
+    // Navigator.pop on the Selection Screen.
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => EditPatient(
+                index: widget.index,
+                patient: _patient,
+              )),
+    );
+
+    // After the Selection Screen returns a result, hide any previous snackbars
+    // and show the new result.
+    setState(() {
+      _patient = result;
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _patient = widget.patient;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          actions: [IconButton(onPressed: () {}, icon: Icon(Icons.edit))],
+          actions: [
+            IconButton(
+                onPressed: () {
+                  _navigateAndDisplaySelection(context);
+                },
+                icon: Icon(Icons.edit)),
+            SizedBox(
+              width: 20,
+            )
+          ],
         ),
         body: Container(
             padding: EdgeInsets.all(13),
@@ -35,7 +78,7 @@ class PatientDetails extends StatelessWidget {
                         Container(
                             padding: EdgeInsets.all(5),
                             height: 120,
-                            width: 120,
+                            width: 140,
                             decoration: BoxDecoration(
                               color: Colors.white,
                               border: Border.all(
@@ -52,23 +95,42 @@ class PatientDetails extends StatelessWidget {
                                       style: TextStyle(color: Colors.blue)),
                                   Divider(color: Colors.blue),
                                   Text(
-                                    '${patient.id}',
-                                    style: TextStyle(fontSize: 30),
+                                    '${_patient.id}',
+                                    style: TextStyle(fontSize: 25),
                                   )
                                 ])),
                         Padding(
-                            padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+                            padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
                             child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('name: ${patient.name}',
-                                      style: TextStyle(fontSize: 30)),
-                                  Text('age: ${patient.age}',
-                                      style: TextStyle(fontSize: 30)),
-                                  Text(
-                                    'Date: ${patient.date}',
-                                    style: TextStyle(fontSize: 30),
-                                  ),
+                                  Row(children: [
+                                    Text('name:',
+                                        style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold)),
+                                    Text(' ${_patient.name}',
+                                        style: TextStyle(fontSize: 24))
+                                  ]),
+                                  Row(children: [
+                                    Text('Age:',
+                                        style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold)),
+                                    SizedBox(
+                                      width: 13,
+                                    ),
+                                    Text(' ${_patient.age}',
+                                        style: TextStyle(fontSize: 24))
+                                  ]),
+                                  Row(children: [
+                                    Text('Date:',
+                                        style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold)),
+                                    Text(' ${_patient.date}',
+                                        style: TextStyle(fontSize: 24))
+                                  ]),
                                 ]))
                       ])),
                   SizedBox(
@@ -83,16 +145,16 @@ class PatientDetails extends StatelessWidget {
                         'statements',
                         style: TextStyle(
                             color: Colors.blue,
-                            fontSize: 30,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold),
                       )),
-                  patient.statements != null
+                  _patient.statements.isNotEmpty
                       ? Container(
                           color: Colors.grey[200],
-                          height: 500,
+                          height: 300,
                           child: ListView.builder(
                               scrollDirection: Axis.horizontal,
-                              itemCount: patient.statements.length,
+                              itemCount: _patient.statements.length,
                               itemBuilder: (context, index) {
                                 return GestureDetector(
                                     onTap: () {
@@ -101,15 +163,15 @@ class PatientDetails extends StatelessWidget {
                                           MaterialPageRoute(
                                               fullscreenDialog: true,
                                               builder: (context) => ShowImage(
-                                                  File(patient
+                                                  File(_patient
                                                       .statements[index]))));
                                     },
                                     child: Container(
                                         padding: EdgeInsets.all(5),
                                         child: SizedBox(
-                                            height: 480,
-                                            child: Image.file(File(
-                                                patient.statements[index])))));
+                                            height: 280,
+                                            child: Image.file(File(widget
+                                                .patient.statements[index])))));
                               }))
                       : Container(
                           color: Colors.grey[200],
@@ -117,7 +179,8 @@ class PatientDetails extends StatelessWidget {
                           child: Center(
                               child: Text(
                             'no statements added',
-                            style: TextStyle(color: Colors.red, fontSize: 20),
+                            style:
+                                TextStyle(color: Colors.red[300], fontSize: 15),
                           ))),
                   Divider(color: Colors.blue),
                   Container(
@@ -126,16 +189,16 @@ class PatientDetails extends StatelessWidget {
                         'examinations',
                         style: TextStyle(
                             color: Colors.blue,
-                            fontSize: 30,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold),
                       )),
-                  patient.examinations != null
+                  _patient.examinations.isNotEmpty
                       ? Container(
                           color: Colors.grey[200],
-                          height: 500,
+                          height: 300,
                           child: ListView.builder(
                               scrollDirection: Axis.horizontal,
-                              itemCount: patient.examinations.length,
+                              itemCount: _patient.examinations.length,
                               itemBuilder: (context, index) {
                                 return GestureDetector(
                                     onTap: () {
@@ -144,14 +207,15 @@ class PatientDetails extends StatelessWidget {
                                           MaterialPageRoute(
                                               fullscreenDialog: true,
                                               builder: (context) => ShowImage(
-                                                  File(patient
+                                                  File(_patient
                                                       .examinations[index]))));
                                     },
                                     child: Container(
                                         padding: EdgeInsets.all(5),
                                         child: SizedBox(
-                                            height: 480,
-                                            child: Image.file(File(patient
+                                            height: 280,
+                                            child: Image.file(File(widget
+                                                .patient
                                                 .examinations[index])))));
                               }))
                       : Container(
@@ -160,7 +224,8 @@ class PatientDetails extends StatelessWidget {
                           child: Center(
                               child: Text(
                             'no examinations added',
-                            style: TextStyle(color: Colors.red, fontSize: 20),
+                            style:
+                                TextStyle(color: Colors.red[300], fontSize: 15),
                           ))),
                   Divider(color: Colors.blue),
                   Container(
@@ -169,16 +234,16 @@ class PatientDetails extends StatelessWidget {
                         'operations',
                         style: TextStyle(
                             color: Colors.blue,
-                            fontSize: 30,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold),
                       )),
-                  patient.operations != null
+                  _patient.operations.isNotEmpty
                       ? Container(
                           color: Colors.grey[200],
-                          height: 500,
+                          height: 300,
                           child: ListView.builder(
                               scrollDirection: Axis.horizontal,
-                              itemCount: patient.operations.length,
+                              itemCount: _patient.operations.length,
                               itemBuilder: (context, index) {
                                 return GestureDetector(
                                     onTap: () {
@@ -187,15 +252,15 @@ class PatientDetails extends StatelessWidget {
                                           MaterialPageRoute(
                                               fullscreenDialog: true,
                                               builder: (context) => ShowImage(
-                                                  File(patient
+                                                  File(_patient
                                                       .operations[index]))));
                                     },
                                     child: Container(
                                         padding: EdgeInsets.all(5),
                                         child: SizedBox(
-                                            height: 480,
-                                            child: Image.file(File(
-                                                patient.operations[index])))));
+                                            height: 280,
+                                            child: Image.file(File(widget
+                                                .patient.operations[index])))));
                               }))
                       : Container(
                           color: Colors.grey[200],
@@ -203,7 +268,8 @@ class PatientDetails extends StatelessWidget {
                           child: Center(
                               child: Text(
                             'no operations added',
-                            style: TextStyle(color: Colors.red, fontSize: 20),
+                            style:
+                                TextStyle(color: Colors.red[300], fontSize: 15),
                           ))),
                 ],
               ),

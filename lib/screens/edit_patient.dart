@@ -8,11 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:alpha/main.dart';
 
-class AddPatient extends StatefulWidget {
-  final String id;
-  AddPatient({this.id});
+class EditPatient extends StatefulWidget {
+  final Patient patient;
+  final int index;
+  EditPatient({this.patient, this.index});
   @override
-  _AddPatientState createState() => _AddPatientState();
+  _EditPatientState createState() => _EditPatientState();
 }
 
 List<String> operations = [];
@@ -22,12 +23,12 @@ List<String> newstatements;
 List<String> newexaminations;
 List<String> newoperations;
 
-void addPatient(String _id, Patient patient) async {
+void editPatient(int _index, Patient patient) async {
   final patientsBox = Hive.box('testbox');
   print('===============patient==json=================');
 
   print(patient.toJson());
-  patientsBox.put(_id, json.encode(patient.toJson()));
+  patientsBox.putAt(_index, json.encode(patient.toJson()));
 }
 
 Future<List<String>> saveSheets(String sheetname, List<String> sheets) async {
@@ -40,16 +41,18 @@ Future<List<String>> saveSheets(String sheetname, List<String> sheets) async {
   return newsheets;
 }
 
-class _AddPatientState extends State<AddPatient> {
+class _EditPatientState extends State<EditPatient> {
   final _namecontroller = TextEditingController();
   final _agecontroller = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   @override
   void initState() {
     super.initState();
-    statements = [];
-    operations = [];
-    examinations = [];
+    _namecontroller.text = widget.patient.name;
+    _agecontroller.text = widget.patient.age;
+    statements = widget.patient.statements;
+    operations = widget.patient.operations;
+    examinations = widget.patient.examinations;
   }
 
   @override
@@ -85,11 +88,11 @@ class _AddPatientState extends State<AddPatient> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    Text('new ID',
+                                    Text('ID',
                                         style: TextStyle(color: Colors.blue)),
                                     Divider(color: Colors.blue),
                                     Text(
-                                      '${widget.id}',
+                                      '${widget.patient.id}',
                                       style: TextStyle(fontSize: 15),
                                     )
                                   ]))),
@@ -98,7 +101,7 @@ class _AddPatientState extends State<AddPatient> {
                         decoration: const InputDecoration(
                           icon: Icon(Icons.person),
                           hintText: 'patient name',
-                          labelText: 'Name *',
+                          labelText: 'edit Name',
                         ),
                         // The validator receives the text that the user has entered.
                         validator: (value) {
@@ -113,7 +116,7 @@ class _AddPatientState extends State<AddPatient> {
                         decoration: const InputDecoration(
                           icon: Icon(Icons.calendar_view_day),
                           hintText: 'patient age',
-                          labelText: 'age *',
+                          labelText: 'edit age',
                         ),
                         // The validator receives the text that the user has entered.
                         validator: (value) {
@@ -392,8 +395,8 @@ class _AddPatientState extends State<AddPatient> {
                           // you'd often call a server or save the information in a database.
                           String patientInfo =
                               _namecontroller.text.replaceAll(' ', '_') +
-                                  '-' +
-                                  widget.id +
+                                  '#' +
+                                  widget.patient.id +
                                   "-";
                           String sheetname =
                               '$dir\\ClinicData\\sheets\\$patientInfo';
@@ -404,10 +407,10 @@ class _AddPatientState extends State<AddPatient> {
                           newoperations = await saveSheets(
                               sheetname + 'operations', operations);
 
-                          addPatient(
-                              widget.id,
+                          editPatient(
+                              widget.index,
                               Patient(
-                                  id: widget.id,
+                                  id: widget.patient.id,
                                   date: DateTime.now()
                                       .toString()
                                       .substring(0, 10),
@@ -416,12 +419,23 @@ class _AddPatientState extends State<AddPatient> {
                                   statements: newstatements,
                                   examinations: newexaminations,
                                   operations: newoperations));
-                          Navigator.pop(context);
+                          Navigator.pop(
+                              context,
+                              Patient(
+                                  id: widget.patient.id,
+                                  date: DateTime.now()
+                                      .toString()
+                                      .substring(0, 10),
+                                  name: _namecontroller.text,
+                                  age: _agecontroller.text,
+                                  statements: newstatements,
+                                  examinations: newexaminations,
+                                  operations: newoperations));
 
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               backgroundColor: Colors.green,
                               content:
-                                  Text('patient data added successfully')));
+                                  Text('patient data updated successfully')));
                         }
                       },
                       child: Text('SAVE'),
